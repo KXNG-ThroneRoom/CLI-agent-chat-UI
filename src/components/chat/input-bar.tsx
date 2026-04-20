@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUp, Mic, Paperclip, Square } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SlashPalette, type PaletteItem } from "./slash-palette";
 import { allSkills } from "@/lib/skills";
@@ -162,10 +162,6 @@ export function InputBar({
           "focus-within:border-violet/60 focus-within:shadow-[0_0_40px_rgba(99,102,241,0.25)]",
         )}
       >
-        <Button variant="icon" size="iconSm" className="mt-1" title="Attach">
-          <Paperclip size={14} />
-        </Button>
-
         <textarea
           ref={taRef}
           rows={1}
@@ -178,15 +174,6 @@ export function InputBar({
           placeholder="Message Hermes…  /  for skills, Shift+Enter for newline"
           className="max-h-[200px] min-h-[28px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground/60 scrollbar-thin"
         />
-
-        <Button
-          variant="icon"
-          size="iconSm"
-          className="mt-1"
-          title="Voice input"
-        >
-          <Mic size={14} />
-        </Button>
 
         {streaming ? (
           <Button
