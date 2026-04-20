@@ -1,9 +1,6 @@
 import { NextRequest } from "next/server";
-import {
-  hermesAvailable,
-  runHermes,
-  runSimulator,
-} from "@/lib/hermes";
+import { hermesAvailable, runSimulator } from "@/lib/hermes";
+import { runHermesACP } from "@/lib/acp-client";
 import type { SSEEvent } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -28,7 +25,7 @@ export async function POST(req: NextRequest) {
         }
       };
 
-      const runner = hermesAvailable() ? runHermes : runSimulator;
+      const runner = hermesAvailable() ? runHermesACP : runSimulator;
       const cancel = runner({
         message,
         sessionId,
