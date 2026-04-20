@@ -201,12 +201,14 @@ function getClient(): ACPClient {
 /** Maps an ACP session/update payload to our SSEEvent stream. */
 function mapUpdate(update: any, emit: (e: SSEEvent) => void) {
   switch (update?.sessionUpdate) {
-    case "agent_message_chunk":
-    case "agent_thought_chunk": {
+    case "agent_message_chunk": {
       const text = update.content?.text;
       if (typeof text === "string") emit({ type: "token", text });
       return;
     }
+    case "agent_thought_chunk":
+      // Internal agent reasoning — not user-visible.
+      return;
     case "tool_call": {
       const tool: ToolCall = {
         id: update.toolCallId ?? nanoid(8),
