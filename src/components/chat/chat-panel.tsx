@@ -54,7 +54,7 @@ export function ChatPanel({
   };
 
   return (
-    <div className="grid-bg relative flex h-full flex-col overflow-hidden">
+    <div className="grid-bg relative flex h-full w-full flex-1 flex-col overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950" />
 
       {/* Session header */}
@@ -79,7 +79,7 @@ export function ChatPanel({
         onScroll={onScroll}
         className="relative z-10 flex-1 overflow-y-auto scrollbar-thin px-6 pb-6"
       >
-        <div className="mx-auto flex max-w-3xl flex-col gap-4 pt-6">
+        <div className="mx-auto flex max-w-4xl flex-col gap-4 pt-6">
           {messages.length === 0 && <EmptyState />}
           {messages.map((m) => (
             <Message key={m.id} message={m} />
@@ -90,7 +90,7 @@ export function ChatPanel({
 
       {/* Input */}
       <div className="relative z-10 px-6 pb-5 pt-2">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           <InputBar
             onSend={(text, skill) => send(text, { skill, sessionId })}
             onStop={stop}
