@@ -14,6 +14,7 @@ const SESSION_TITLES = [
 ];
 
 export default function Page() {
+  const [mounted, setMounted] = useState(false);
   const [agent, setAgent] = useState("hermes");
   const [sessionId, setSessionId] = useState("init");
   const [sessionTitle, setSessionTitle] = useState(SESSION_TITLES[0]);
@@ -21,8 +22,9 @@ export default function Page() {
   const [activity, setActivity] = useState<ToolCall[]>([]);
 
   useEffect(() => {
-    // Initialize session ID on client only to avoid hydration mismatch
+    // Initialize session ID and defer rendering until client is ready
     setSessionId(nanoid(12));
+    setMounted(true);
 
     const handler = (e: Event) => {
       const ce = e as CustomEvent<string>;
@@ -54,6 +56,10 @@ export default function Page() {
     setSessionTitle("Restored session");
     window.dispatchEvent(new CustomEvent("hermes:clear"));
   }, []);
+
+  if (!mounted) {
+    return <main className="h-screen w-screen bg-ink-950" />;
+  }
 
   return (
     <main className="flex h-screen w-screen bg-ink-950">

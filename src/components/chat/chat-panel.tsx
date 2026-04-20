@@ -114,24 +114,25 @@ function EmptyState() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="mx-auto mt-24 flex max-w-lg flex-col items-center text-center"
+      className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-3 py-8"
     >
-      <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet/20 to-cyan/10 shadow-[0_0_40px_rgba(99,102,241,0.35)]">
-        <Sparkles size={28} className="text-violet-glow" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet/20 to-cyan/10 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
+        <Sparkles size={22} className="text-violet-glow" />
       </div>
-      <h2 className="text-gradient bg-clip-text text-2xl font-semibold tracking-tight">
-        Hermes is online
-      </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Ask anything. Start with <kbd className="kbd">/</kbd> to browse skills,
-        or jump in:
-      </p>
-      <div className="mt-6 grid w-full grid-cols-1 gap-2">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold text-violet-glow">
+          Hermes is online
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Type a message, press <kbd className="rounded px-1 py-0.5 bg-white/5 text-[10px] font-mono">/</kbd> for skills
+        </p>
+      </div>
+      <div className="mt-2 grid w-full grid-cols-2 gap-2">
         {[
-          "Summarize my recent arXiv papers",
-          "Open a PR for my latest changes",
-          "Debug the failing test in auth.spec.ts",
-          "Draft a writing plan for the new feature",
+          "Summarize arXiv papers",
+          "Open a PR",
+          "Debug failing test",
+          "Draft a writing plan",
         ].map((s) => (
           <button
             key={s}
@@ -140,7 +141,7 @@ function EmptyState() {
                 new CustomEvent("hermes:prefill", { detail: s }),
               )
             }
-            className="glass rounded-xl px-3 py-2 text-left text-sm text-foreground/85 transition hover:border-violet/40 hover:shadow-[0_0_25px_rgba(99,102,241,0.2)]"
+            className="glass rounded-lg px-2 py-1.5 text-left text-xs text-foreground/80 transition hover:border-violet/40 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)]"
           >
             {s}
           </button>
