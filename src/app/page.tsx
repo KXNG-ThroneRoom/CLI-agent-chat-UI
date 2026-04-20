@@ -15,12 +15,15 @@ const SESSION_TITLES = [
 
 export default function Page() {
   const [agent, setAgent] = useState("hermes");
-  const [sessionId, setSessionId] = useState(() => nanoid(12));
+  const [sessionId, setSessionId] = useState("init");
   const [sessionTitle, setSessionTitle] = useState(SESSION_TITLES[0]);
   const [prefill, setPrefill] = useState<string | null>(null);
   const [activity, setActivity] = useState<ToolCall[]>([]);
 
   useEffect(() => {
+    // Initialize session ID on client only to avoid hydration mismatch
+    setSessionId(nanoid(12));
+
     const handler = (e: Event) => {
       const ce = e as CustomEvent<string>;
       setPrefill(ce.detail);
