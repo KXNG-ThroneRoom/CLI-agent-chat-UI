@@ -153,16 +153,19 @@ export function runHermes(opts: {
   onClose: () => void;
 }): () => void {
   const { cmd, args } = hermesCmd();
-  const baseArgs = [...args, "chat", "--stream"];
-  if (opts.sessionId) baseArgs.push("--session", opts.sessionId);
-  if (opts.skill) baseArgs.push("--skill", opts.skill);
-  baseArgs.push("--message", opts.message);
+  const baseArgs = [...args, "chat"];
+  if (opts.skill) baseArgs.push("--skills", opts.skill);
 
   const started = Date.now();
   const child = spawn(cmd, baseArgs, {
     cwd: process.cwd(),
     env: process.env,
   });
+
+  // Pipe message via stdin (hermes chat is an interactive REPL, not --message flag)
+  child.stdin.write(opts.message + "\n");
+  child.stdin.end();
+  child.stdin.on("error", () => {}); // suppress EPIPE if hermes closes stdin early
 
   const parser = new HermesParser();
   let tokens = 0;
