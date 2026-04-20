@@ -8,3 +8,7 @@ dist
 .vercel
 next-env.d.ts.bak
 tsconfig.tsbuildinfo
+dist-electron
+electron/icon.icns
+electron/icon.png
+electron/icon.iconset

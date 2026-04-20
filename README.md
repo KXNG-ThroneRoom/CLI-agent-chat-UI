@@ -7,7 +7,7 @@ Real-time streaming from the Hermes CLI via SSE, tool-call visualization,
 live memory / processes / cron / session panels, and a `/`-triggered
 skill palette.
 
-## Quick start
+## Quick start (web)
 
 ```bash
 npm install
@@ -17,6 +17,37 @@ npm run dev
 
 The UI works out of the box in **simulator mode** — it streams a scripted
 cinematic response so you can try the whole flow without installing Hermes.
+
+## Run as a macOS app (dock icon + offline)
+
+```bash
+# one-time: generate the .icns icon (requires `brew install librsvg`)
+./electron/make-icon.sh
+
+# develop with hot-reload inside an Electron window
+npm run electron:dev
+
+# build a distributable .app + .dmg
+npm run electron:build
+# outputs: dist-electron/Hermes Console-0.1.0-arm64.dmg (and x64)
+```
+
+Open the generated `.dmg`, drag **Hermes Console** to `/Applications`, and
+pin it to your dock. The app bundles the Next.js standalone server so it
+runs fully offline — no dev server required.
+
+First launch will show an "unidentified developer" warning since the app
+isn't code-signed. Right-click → Open → Open to bypass (only needed once).
+
+### Environment
+
+Env vars you set in your shell (`HERMES_CMD`, `HERMES_HOME`) are inherited
+by the packaged app when launched from Finder via `launchd`'s shell
+environment. For rock-solid control, launch from a terminal:
+
+```bash
+HERMES_CMD=hermes open -a "Hermes Console"
+```
 
 ## Connecting the real Hermes CLI
 
