@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
   CalendarClock,
+  ChevronLeft,
+  ChevronRight,
   Cpu,
   History,
   Zap,
@@ -28,6 +30,10 @@ type Props = {
 };
 
 export function RightSidebar({ activity, onLoadSession }: Props) {
+  const [open, setOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("hermes:right-sidebar") !== "closed";
+  });
   const [tab, setTab] = useState<Tab>("memory");
   const [memory, setMemory] = useState<MemoryFact[]>([]);
   const [processes, setProcesses] = useState<ActiveProcess[]>([]);
@@ -52,6 +58,10 @@ export function RightSidebar({ activity, onLoadSession }: Props) {
       .then((d) => setSessions(d.sessions ?? []))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("hermes:right-sidebar", open ? "open" : "closed");
+  }, [open]);
 
   const tabs: { id: Tab; label: string; icon: LucideIcon; count?: number }[] =
     useMemo(
@@ -90,71 +100,87 @@ export function RightSidebar({ activity, onLoadSession }: Props) {
       initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="glass flex h-full w-[280px] shrink-0 flex-col border-l border-white/[0.06]"
+      className={cn(
+        "glass relative flex h-full shrink-0 flex-col overflow-hidden border-l border-white/[0.06] transition-[width] duration-300 ease-out",
+        open ? "w-[280px]" : "w-12",
+      )}
     >
-      <div className="flex gap-1 overflow-x-auto scrollbar-thin border-b border-white/[0.06] px-2 pt-2">
-        {tabs.map((t) => {
-          const Icon = t.icon;
-          const active = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={cn(
-                "group relative flex items-center gap-1.5 rounded-t-md px-2.5 py-2 text-[11px] font-medium transition",
-                active
-                  ? "text-white"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Icon size={12} />
-              <span>{t.label}</span>
-              {typeof t.count === "number" && t.count > 0 && (
-                <span
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="absolute left-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-black/30 text-muted-foreground transition hover:border-violet/40 hover:text-foreground"
+        aria-label={open ? "Collapse right sidebar" : "Expand right sidebar"}
+      >
+        {open ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+      </button>
+
+      {open && (
+        <>
+          <div className="flex gap-1 overflow-x-auto scrollbar-thin border-b border-white/[0.06] px-2 pl-10 pt-2">
+            {tabs.map((t) => {
+              const Icon = t.icon;
+              const active = tab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
                   className={cn(
-                    "rounded-full px-1.5 py-0 text-[9px] font-mono",
+                    "group relative flex items-center gap-1.5 rounded-t-md px-2.5 py-2 text-[11px] font-medium transition",
                     active
-                      ? "bg-violet/20 text-violet-glow"
-                      : "bg-white/5 text-muted-foreground",
+                      ? "text-white"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {t.count}
-                </span>
-              )}
-              {active && (
-                <motion.span
-                  layoutId="rs-tab-ind"
-                  className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-violet via-cyan to-violet"
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
+                  <Icon size={12} />
+                  <span>{t.label}</span>
+                  {typeof t.count === "number" && t.count > 0 && (
+                    <span
+                      className={cn(
+                        "rounded-full px-1.5 py-0 text-[9px] font-mono",
+                        active
+                          ? "bg-violet/20 text-violet-glow"
+                          : "bg-white/5 text-muted-foreground",
+                      )}
+                    >
+                      {t.count}
+                    </span>
+                  )}
+                  {active && (
+                    <motion.span
+                      layoutId="rs-tab-ind"
+                      className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-violet via-cyan to-violet"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin p-3">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={tab}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.18 }}
-            className="flex flex-col gap-2"
-          >
-            {tab === "memory" && <MemoryList facts={memory} />}
-            {tab === "processes" && <ProcessList processes={processes} />}
-            {tab === "crons" && <CronList jobs={crons} />}
-            {tab === "sessions" && (
-              <SessionList
-                sessions={sessions}
-                onLoad={onLoadSession}
-              />
-            )}
-            {tab === "activity" && <ActivityFeed activity={activity} />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          <div className="flex-1 overflow-y-auto scrollbar-thin p-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tab}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-col gap-2"
+              >
+                {tab === "memory" && <MemoryList facts={memory} />}
+                {tab === "processes" && <ProcessList processes={processes} />}
+                {tab === "crons" && <CronList jobs={crons} />}
+                {tab === "sessions" && (
+                  <SessionList
+                    sessions={sessions}
+                    onLoad={onLoadSession}
+                  />
+                )}
+                {tab === "activity" && <ActivityFeed activity={activity} />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </>
+      )}
     </motion.aside>
   );
 }

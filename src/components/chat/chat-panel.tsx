@@ -53,6 +53,14 @@ export function ChatPanel({
     setAutoScroll(atBottom);
   };
 
+  const updateMessage = (id: string, content: string) => {
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === id ? { ...message, content } : message,
+      ),
+    );
+  };
+
   return (
     <div className="grid-bg relative flex h-full w-full flex-1 flex-col overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950" />
@@ -82,7 +90,7 @@ export function ChatPanel({
         <div className="mx-auto flex max-w-4xl flex-col gap-4 pt-6">
           {messages.length === 0 && <EmptyState />}
           {messages.map((m) => (
-            <Message key={m.id} message={m} />
+            <Message key={m.id} message={m} onUpdate={updateMessage} />
           ))}
           <div className="h-4" />
         </div>
