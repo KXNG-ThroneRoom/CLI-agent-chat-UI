@@ -27,6 +27,8 @@ type Pending = {
   reject: (e: Error) => void;
 };
 
+const DEBUG_STREAM = process.env.NODE_ENV !== "production";
+
 class ACPClient {
   private child: ChildProcess | null = null;
   private initPromise: Promise<void> | null = null;
@@ -89,6 +91,13 @@ class ACPClient {
   }
 
   private onStdout(buf: Buffer) {
+    if (DEBUG_STREAM) {
+      console.debug("[stream][acp-stdout]", {
+        at: new Date().toISOString(),
+        bytes: buf.length,
+        preview: buf.toString("utf8").slice(0, 240),
+      });
+    }
     this.buffer += buf.toString("utf8");
     while (true) {
       const nl = this.buffer.indexOf("\n");
@@ -200,6 +209,12 @@ function getClient(): ACPClient {
 
 /** Maps an ACP session/update payload to our SSEEvent stream. */
 function mapUpdate(update: any, emit: (e: SSEEvent) => void) {
+  if (DEBUG_STREAM) {
+    console.debug("[stream][acp-update]", {
+      at: new Date().toISOString(),
+      sessionUpdate: update?.sessionUpdate,
+    });
+  }
   switch (update?.sessionUpdate) {
     case "agent_message_chunk": {
       const text = update.content?.text;
@@ -263,6 +278,12 @@ export function runHermesACP(opts: {
   const emit = (e: SSEEvent) => {
     if (cancelled) return;
     if (e.type === "token") tokens += e.text.length;
+    if (DEBUG_STREAM) {
+      console.debug("[stream][acp-emit]", {
+        at: new Date().toISOString(),
+        type: e.type,
+      });
+    }
     opts.onEvent(e);
   };
 

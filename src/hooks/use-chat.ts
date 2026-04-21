@@ -5,6 +5,7 @@ import type { ChatMessage, SSEEvent, ToolCall } from "@/lib/types";
 import { nanoid } from "@/lib/utils";
 
 type SendOpts = { skill?: string; sessionId?: string };
+const DEBUG_STREAM = process.env.NODE_ENV !== "production";
 
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -66,6 +67,12 @@ export function useChat() {
           const { value, done } = await reader.read();
           if (done) break;
           buf += decoder.decode(value, { stream: true });
+          if (DEBUG_STREAM) {
+            console.debug("[stream][ui-chunk]", {
+              at: new Date().toISOString(),
+              chars: value?.length ?? 0,
+            });
+          }
 
           const parts = buf.split("\n\n");
           buf = parts.pop() ?? "";
@@ -80,6 +87,12 @@ export function useChat() {
               event = JSON.parse(data);
             } catch {
               continue;
+            }
+            if (DEBUG_STREAM) {
+              console.debug("[stream][ui-event]", {
+                at: new Date().toISOString(),
+                type: event.type,
+              });
             }
             applyEvent(event, asstId, setMessages, setActiveToolCalls);
           }
